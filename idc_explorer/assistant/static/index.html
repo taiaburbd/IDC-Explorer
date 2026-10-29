@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IDC assistant</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #1c2430;
+      --muted: #5c6b7a;
+      --line: #d7dee6;
+      --paper: #f6f8fa;
+      --accent: #0b6e6a;
+      --warn: #8a4b08;
+      --warn-bg: #fff6e8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font: 16px/1.5 "Iowan Old Style", Palatino, Georgia, serif;
+      color: var(--ink);
+      background: var(--paper);
+    }
+    main { max-width: 920px; margin: 0 auto; padding: 32px 20px 64px; }
+    h1 { font-size: 1.8rem; font-weight: 600; margin: 0 0 8px; }
+    .lede { color: var(--muted); margin: 0 0 20px; }
+    form { display: flex; gap: 8px; }
+    input[type="text"] {
+      flex: 1;
+      font: inherit;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: white;
+    }
+    button, .examples button {
+      font: 14px/1.2 ui-sans-serif, system-ui, sans-serif;
+      background: var(--accent);
+      color: white;
+      border: 0;
+      border-radius: 8px;
+      padding: 10px 14px;
+      cursor: pointer;
+    }
+    .examples { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 20px; }
+    .examples button { background: white; color: var(--accent); border: 1px solid var(--line); }
+    label.confirm { display: flex; gap: 8px; align-items: center; font: 14px ui-sans-serif, system-ui, sans-serif; color: var(--muted); }
+    section { background: white; border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; margin-top: 14px; }
+    h2 { font: 600 13px/1.2 ui-sans-serif, system-ui, sans-serif; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+    pre { overflow: auto; background: #101820; color: #e7eef4; padding: 12px; border-radius: 8px; font: 13px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace; }
+    table { width: 100%; border-collapse: collapse; font: 13px/1.4 ui-sans-serif, system-ui, sans-serif; }
+    th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    a { color: var(--accent); }
+    .warn { background: var(--warn-bg); color: var(--warn); padding: 10px 12px; border-radius: 8px; }
+    .notes { color: var(--muted); padding-left: 18px; }
+    .row-actions { display: flex; gap: 8px; margin-top: 8px; }
+    .hidden { display: none; }
+    #status { min-height: 1.4em; color: var(--muted); font: 14px ui-sans-serif, system-ui, sans-serif; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>IDC assistant</h1>
+  <p class="lede">Ask for a cohort. You get the rows, the SQL that produced them, viewer links, and a download manifest. No account.</p>
+  <form id="ask">
+    <input id="question" type="text" name="question" placeholder="Show me a few chest CT series" autocomplete="off" required>
+    <button type="submit">Ask</button>
+  </form>
+  <div class="examples" id="examples"></div>
+  <label class="confirm"><input id="confirm" type="checkbox"> I confirm a download of 1 GB or more</label>
+  <p id="status"></p>
+  <div id="out"></div>
+</main>
+<script>
+const examples = [
+  "How many patients are in rider_pilot?",
+  "Show me a few chest CT series",
+  "What licence applies to rider_pilot?",
+  "Which collections mention lung cancer?"
+];
+const examplesEl = document.querySelector("#examples");
+for (const text of examples) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.textContent = text;
+  button.addEventListener("click", () => {
+    document.querySelector("#question").value = text;
+    document.querySelector("#ask").requestSubmit();
+  });
+  examplesEl.appendChild(button);
+}
+
+let lastAnswer = null;
+
+function table(rows) {
+  if (!rows || !rows.length) return "<p>No rows.</p>";
+  const cols = Object.keys(rows[0]).filter(key => key !== "series_aws_url");
+  const head = cols.map(col => `<th>${col}</th>`).join("");
+  const body = rows.slice(0, 20).map(row =>
+    "<tr>" + cols.map(col => `<td>${row[col] ?? ""}</td>`).join("") + "</tr>"
+  ).join("");
+  return `<table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
+}
+
+function section(title, html) {
+  return `<section><h2>${title}</h2>${html}</section>`;
+}
+
+function render(answer) {
+  lastAnswer = answer;
+  const parts = [];
+  parts.push(section("Answer", `<p>${answer.summary}</p>` +
+    (answer.notes || []).map(note => `<p class="notes">${note}</p>`).join("")));
+  if (answer.cohort) {
+    parts.push(section("Cohort", table([answer.cohort])));
+  }
+  if (answer.guardrail) {
+    const licences = (answer.guardrail.licences || [])
+      .map(item => `<li><strong>${item.name}</strong> — ${item.note}</li>`).join("");
+    let html = "";
+    if (answer.guardrail.message) html += `<p class="warn">${answer.guardrail.message}</p>`;
+    if (licences) html += `<ul>${licences}</ul>`;
+    if (!html) html = "<p>No licence column on these rows, and the size is under the warning line.</p>";
+    parts.push(section("Licence and size", html));
+  }
+  if (answer.rows) parts.push(section("Rows", table(answer.rows)));
+  if (answer.viewer_links && answer.viewer_links.length) {
+    const items = answer.viewer_links.map(link =>
+      `<li><a href="${link.url}" target="_blank" rel="noreferrer">${link.collection_id || "study"} · ${link.StudyInstanceUID}</a></li>`
+    ).join("");
+    parts.push(section("Viewer", `<ul>${items}</ul>`));
+  }
+  if (answer.work) {
+    parts.push(section("SQL", `<pre>${answer.work.idc_index_sql}</pre>`));
+    parts.push(section("Python", `<pre>${answer.work.python}</pre>`));
+    const bq = answer.work.bigquery_sql
+      ? `<pre>${answer.work.bigquery_sql}</pre><p>${answer.work.bigquery_note}</p>`
+      : `<p>${answer.work.bigquery_note}</p>`;
+    parts.push(section("BigQuery", bq));
+  }
+  if (answer.manifest) {
+    parts.push(section("Download manifest", `<pre>${answer.manifest}</pre>`));
+  }
+  parts.push(`<div class="row-actions"><button type="button" id="notebook">Download Colab notebook</button></div>`);
+  document.querySelector("#out").innerHTML = parts.join("");
+  document.querySelector("#notebook").addEventListener("click", downloadNotebook);
+}
+
+async function downloadNotebook() {
+  if (!lastAnswer) return;
+  const response = await fetch("/notebook", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({answer: lastAnswer})
+  });
+  const blob = await response.blob();
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "idc_cohort.ipynb";
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+document.querySelector("#ask").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const question = document.querySelector("#question").value;
+  const confirm_large = document.querySelector("#confirm").checked;
+  document.querySelector("#status").textContent = "Querying the index…";
+  const response = await fetch("/ask", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({question, confirm_large})
+  });
+  const answer = await response.json();
+  document.querySelector("#status").textContent = response.ok ? "" : (answer.error || "Request failed");
+  if (response.ok) render(answer);
+});
+</script>
+</body>
+</html>

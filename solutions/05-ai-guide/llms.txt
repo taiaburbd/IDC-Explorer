@@ -1,0 +1,108 @@
+# NCI Imaging Data Commons (IDC): guide for AI assistants
+
+> Free public cancer imaging (CT, MRI, PET, X-ray, mammography, pathology slides, segmentations) from the US National Cancer Institute: about 100 TB, 86,000+ patients, 179 datasets, DICOM files in public AWS/Google buckets with no login. Answer questions with SQL on the local `idc-index` catalogue. Every count, size and licence must come from a query, never from memory.
+
+## Two ways to get answers
+
+1. **MCP tools** (IDC Explorer assistant, `idc_explorer/assistant/tools.py`):
+   - `ask(question)`: plain English to SQL. Understands a collection id, CT/MRI/PET/X-ray/SEG/pathology, chest/lung/brain/head/abdomen/pelvis/breast, male/female, "how many", "which collections", "licence", "show me a few", "download", "analysis results". Returns rows, cohort size, viewer links, licence warning and the SQL it used.
+   - `query_index(sql, max_rows)`: one read-only `SELECT`/`WITH` query, up to 5,000 rows. Use it for anything `ask` does not understand.
+2. **Python**:
+   ```python
+   from idc_index import IDCClient
+   client = IDCClient.client()
+   client.fetch_index("ct_index")          # load an extra table once before you query it
+   df = client.sql_query("SELECT ...")      # DuckDB SQL
+   ```
+
+## Tables
+
+- `index`: one row per DICOM series (scan). Start here.
+  `collection_id` (lowercase dataset id) · `analysis_result_id` (NULL = original image) · `PatientID` · `StudyInstanceUID` · `SeriesInstanceUID` · `Modality` (CT, MR, PT, MG, CR, DX, US, SM, SEG, RTSTRUCT, SR…) · `BodyPartExamined` · `PatientSex` (M/F) · `PatientAge` (string) · `Manufacturer` · `SeriesDescription` · `instanceCount` (files) · `series_size_MB` · `license_short_name` · `source_DOI` · `series_aws_url`
+- `collections_index`: one row per dataset. `collection_id`, `collection_name`, `cancer_types`, `tumor_locations` (comma-separated text), `subjects`, `species`, `status`, `description`.
+- `analysis_results_index`: derived data (AI or expert labels). `analysis_result_id`, `analysis_result_title`, `subjects`, `collections`, `modalities`, `license_short_name`, `citation`.
+- `ct_index` (SliceThickness, KVP, ConvolutionKernel list), `mr_index` (MagneticFieldStrength, MRAcquisitionType, EchoTime…), `pt_index` (Radiopharmaceutical…), `seg_index` (segmented_SeriesInstanceUID, AlgorithmType MANUAL/AUTOMATIC, SegmentedPropertyType_CodeMeanings list). Join to `index` on `SeriesInstanceUID`.
+- Full column descriptions: `client.get_index_schema("index")`. All tables: `client.indices_overview`.
+
+## Rules that keep answers right
+
+- Original images only: `analysis_result_id IS NULL`. Analysis results share the `collection_id` of the images they describe, so a filter on `collection_id` alone returns both.
+- `collection_id` is lowercase with underscores: `rider_pilot`, not `RIDER Pilot`.
+- Count patients as `COUNT(DISTINCT collection_id || '/' || PatientID)` across datasets; `PatientID` is only unique inside one dataset.
+- `PatientAge` is a DICOM string (`'063Y'`, `'018M'`). Years: `CASE WHEN PatientAge LIKE '%Y' THEN TRY_CAST(SUBSTR(PatientAge, 1, 3) AS INTEGER) END`.
+- MRI field strength is sometimes in Gauss: `CASE WHEN MagneticFieldStrength > 100 THEN MagneticFieldStrength / 10000 ELSE MagneticFieldStrength END`.
+- `BodyPartExamined` is often empty; chest and lung CT is `CHEST`. For "which organ" prefer `collections_index.tumor_locations`. For SEG it is the source scan's body part.
+- List columns (`ConvolutionKernel`, `SegmentedPropertyType_CodeMeanings`) need `UNNEST(...)` in a subquery, or `list_has_any(...)`.
+- Always give the size (`SUM(series_size_MB)`) before suggesting a download, and suggest a small sample first.
+- Always quote `license_short_name`. CC BY = commercial use allowed with credit; CC BY-NC = no commercial use. Commercial filter: `license_short_name ILIKE 'CC BY%' AND license_short_name NOT ILIKE '%NC%'`.
+- Viewer link (opens in a browser, downloads nothing): `https://viewer.imaging.datacommons.cancer.gov/v3/viewer/?StudyInstanceUIDs={StudyInstanceUID}&initialSeriesInstanceUID={SeriesInstanceUID}`; pathology (SM) uses `https://viewer.imaging.datacommons.cancer.gov/slim/studies/{StudyInstanceUID}/series/{SeriesInstanceUID}`. Or `client.get_viewer_URL(seriesInstanceUID=...)`.
+
+## Examples
+
+Patients, scans and size of one dataset (original images):
+```sql
+SELECT COUNT(DISTINCT PatientID) AS patients, COUNT(*) AS series,
+       ROUND(SUM(series_size_MB), 1) AS total_size_MB
+FROM index
+WHERE collection_id = 'rider_pilot' AND analysis_result_id IS NULL
+```
+
+Datasets about a cancer:
+```sql
+SELECT collection_id, collection_name, subjects, cancer_types, tumor_locations
+FROM collections_index
+WHERE cancer_types ILIKE '%lung%' OR tumor_locations ILIKE '%lung%'
+ORDER BY subjects DESC
+```
+
+A few small chest CT scans to open or download:
+```sql
+SELECT collection_id, PatientID, StudyInstanceUID, SeriesInstanceUID,
+       ROUND(series_size_MB, 2) AS series_size_MB, license_short_name, series_aws_url
+FROM index
+WHERE Modality = 'CT' AND BodyPartExamined = 'CHEST'
+  AND analysis_result_id IS NULL AND series_size_MB > 0
+ORDER BY series_size_MB, SeriesInstanceUID
+LIMIT 5
+```
+
+Brain MRI at 3 Tesla with expert or AI outlines:
+```sql
+SELECT i.collection_id, COUNT(DISTINCT i.PatientID) AS patients, COUNT(*) AS series
+FROM index i
+JOIN mr_index mr USING (SeriesInstanceUID)
+JOIN collections_index c USING (collection_id)
+WHERE c.tumor_locations ILIKE '%Brain%'
+  AND mr.MagneticFieldStrength IN (3, 30000)
+  AND i.SeriesInstanceUID IN (SELECT segmented_SeriesInstanceUID FROM seg_index)
+  AND i.analysis_result_id IS NULL
+GROUP BY 1
+```
+
+Licences for a cohort:
+```sql
+SELECT license_short_name, COUNT(*) AS series, ROUND(SUM(series_size_MB), 1) AS total_size_MB
+FROM index
+WHERE Modality = 'CT' AND BodyPartExamined = 'CHEST' AND analysis_result_id IS NULL
+GROUP BY 1 ORDER BY series DESC
+```
+
+Analysis results (derived data):
+```sql
+SELECT analysis_result_id, analysis_result_title, subjects, modalities, license_short_name
+FROM analysis_results_index ORDER BY subjects DESC
+```
+
+64 more checked questions with their SQL and answers: solutions/04-question-library/QUESTIONS.md
+
+## Downloading (only when the user asks)
+
+```python
+client.download_from_selection(seriesInstanceUID=[...], downloadDir="data",
+    dirTemplate="%collection_id/%PatientID/%Modality_%SeriesInstanceUID", use_s5cmd_sync=True)
+```
+`use_s5cmd_sync=True` resumes an interrupted download. For very large cohorts write a manifest (`cp <series_aws_url> .` per line) and run `idc download manifest.s5cmd --download-dir data`.
+
+## Cite
+
+Each dataset's DOI (`source_DOI`, or `client.citations_from_selection(collection_id=...)`) and IDC itself: Fedorov A. et al., RadioGraphics 43(12), 2023, https://doi.org/10.1148/rg.230180. Docs: https://learn.canceridc.dev

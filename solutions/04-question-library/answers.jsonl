@@ -1,0 +1,64 @@
+{"id": "q001", "answer": {"ok": true, "rows": [{"patients": 8}]}}
+{"id": "q002", "answer": {"ok": true, "rows": [{"studies": 154, "series": 774}]}}
+{"id": "q003", "answer": {"ok": true, "rows": [{"total_size_MB": 11259.2}]}}
+{"id": "q004", "answer": {"ok": true, "rows": [{"series": 0}]}}
+{"id": "q005", "answer": {"ok": true, "rows": [{"series": 172}]}}
+{"id": "q006", "answer": {"ok": true, "rows": [{"Modality": "PR", "series": 240}, {"Modality": "SEG", "series": 200}, {"Modality": "CT", "series": 172}, {"Modality": "SR", "series": 140}, {"Modality": "DX", "series": 20}]}}
+{"id": "q007", "answer": {"ok": true, "rows": [{"series": 128143}]}}
+{"id": "q008", "answer": {"ok": true, "rows": [{"series": 5929}]}}
+{"id": "q009", "answer": {"ok": true, "rows": [{"series": 76300}]}}
+{"id": "q010", "answer": {"ok": true, "rows": [{"series": 193295}]}}
+{"id": "q011", "answer": {"ok": true, "rows": [{"series": 12534}]}}
+{"id": "q012", "answer": {"ok": true, "rows": [{"series": 3712}]}}
+{"id": "q013", "answer": {"ok": true, "rows": [{"series": 19366}]}}
+{"id": "q014", "answer": {"ok": true, "rows": [{"series": 205851, "patients": 29340}]}}
+{"id": "q015", "answer": {"ok": true, "rows": [{"series": 228}]}}
+{"id": "q016", "answer": {"ok": true, "rows": [{"series": 266}]}}
+{"id": "q017", "answer": {"ok": true, "rows": [{"series": 48333}]}}
+{"id": "q018", "answer": {"ok": true, "rows": [{"series": 9797}]}}
+{"id": "q019", "answer": {"ok": true, "rows": [{"series": 462}]}}
+{"id": "q020", "answer": {"ok": true, "rows": [{"BodyPartExamined": "CHEST", "series": 205851}, {"BodyPartExamined": null, "series": 31571}, {"BodyPartExamined": "ABDOMEN", "series": 9797}, {"BodyPartExamined": "LUNG", "series": 7085}, {"BodyPartExamined": "COLON", "series": 3543}]}}
+{"id": "q021", "answer": {"ok": true, "rows": [{"SeriesInstanceUID": "1.3.6.1.4.1.9328.50.1.53734", "series_size_MB": 0.53}, {"SeriesInstanceUID": "1.3.6.1.4.1.9328.50.1.54657", "series_size_MB": 0.53}, {"SeriesInstanceUID": "1.3.6.1.4.1.9328.50.1.69736", "series_size_MB": 0.53}]}}
+{"id": "q022", "answer": {"ok": true, "rows": [{"min_mb": 0.0}]}}
+{"id": "q023", "answer": {"ok": true, "rows": [{"series": 11749}]}}
+{"id": "q024", "answer": {"ok": true, "rows": [{"series": 21819}]}}
+{"id": "q025", "answer": {"ok": true, "rows": [{"license_short_name": "CC BY 4.0", "series": 774}]}}
+{"id": "q026", "answer": {"ok": true, "rows": [{"licences": 5}]}}
+{"id": "q027", "answer": {"ok": true, "rows": [{"license_short_name": "CC BY 4.0", "series": 877215}, {"license_short_name": "CC BY 3.0", "series": 132303}, {"license_short_name": "CC BY-NC 4.0", "series": 28783}, {"license_short_name": "CC BY-NC 3.0", "series": 5851}, {"license_short_name": "National Library of Medicine Terms and Conditions; May 21, 2019", "series": 39}]}}
+{"id": "q028", "answer": {"ok": true, "rows": [{"series": 194}]}}
+{"id": "q029", "answer": {"ok": true, "rows": [{"series": 580}]}}
+{"id": "q030", "answer": {"ok": true, "rows": [{"patients": 2}]}}
+{"id": "q031", "answer": {"ok": true, "rows": [{"patients": 3}]}}
+{"id": "q032", "answer": {"ok": true, "rows": [{"PatientSex": "M", "patients": 3}, {"PatientSex": null, "patients": 3}, {"PatientSex": "F", "patients": 2}]}}
+{"id": "q033", "answer": {"ok": true, "rows": [{"Manufacturer": "Siemens Corporate Research", "series": 500}, {"Manufacturer": "GE MEDICAL SYSTEMS", "series": 192}, {"Manufacturer": "CoreLab Partners, Inc.", "series": 40}, {"Manufacturer": null, "series": 40}, {"Manufacturer": "FUJI PHOTO FILM Co., ltd.", "series": 2}]}}
+{"id": "q034", "answer": {"ok": true, "rows": [{"manufacturers": 45}]}}
+{"id": "q035", "answer": {"ok": true, "rows": [{"collection_id": "cptac_lscc", "StudyInstanceUID": "1.3.6.1.4.1.14519.5.2.1.2932.1975.254952868886549805431826409949", "SeriesInstanceUID": "1.3.6.1.4.1.14519.5.2.1.2932.1975.176380334560821992208209523155", "Modality": "CT"}, {"collection_id": "tcga_luad", "StudyInstanceUID": "1.3.6.1.4.1.14519.5.2.1.7777.9002.142043828961014314666225060208", "SeriesInstanceUID": "1.3.6.1.4.1.14519.5.2.1.7777.9002.849099653159079576678862721288", "Modality": "CT"}, {"collection_id": "tcga_luad", "StudyInstanceUID": "1.3.6.1.4.1.14519.5.2.1.7777.9002.142043828961014314666225060208", "SeriesInstanceUID": "1.3.6.1.4.1.14519.5.2.1.7777.9002.130923920239843396070127231888", "Modality": "CT"}, {"collection_id": "covid_19_ny_sbu", "StudyInstanceUID": "1.3.6.1.4.1.14519.5.2.1.99.1071.17465946593206773704529689117166", "SeriesInstanceUID": "1.3.6.1.4.1.14519.5.2.1.99.1071.69578962348294361005870444478455", "Modality": "CT"}, {"collection_id": "nlst", "StudyInstanceUID": "1.2.840.113654.2.55.223769401829055937056752359810562732316", "SeriesInstanceUID": "1.2.840.113654.2.55.271995849322416019646484984622072643817", "Modality": "CT"}]}}
+{"id": "q036", "answer": {"ok": true, "rows": [{"StudyInstanceUID": "1.3.6.1.4.1.9328.50.1.54652", "SeriesInstanceUID": "1.3.6.1.4.1.9328.50.1.54657"}, {"StudyInstanceUID": "1.3.6.1.4.1.9328.50.1.53671", "SeriesInstanceUID": "1.3.6.1.4.1.9328.50.1.53734"}, {"StudyInstanceUID": "1.3.6.1.4.1.9328.50.1.69732", "SeriesInstanceUID": "1.3.6.1.4.1.9328.50.1.69736"}]}}
+{"id": "q037", "answer": {"ok": true, "rows": [{"collections": 179}]}}
+{"id": "q038", "answer": {"ok": true, "rows": [{"collection_id": "nlst", "subjects": 26410}, {"collection_id": "eay131", "subjects": 2813}, {"collection_id": "covid_19_ny_sbu", "subjects": 1384}, {"collection_id": "lidc_idri", "subjects": 1010}, {"collection_id": "pdxnet", "subjects": 919}]}}
+{"id": "q039", "answer": {"ok": true, "rows": [{"collection_id": "cbis_ddsm", "subjects": 6671}, {"collection_id": "breast_cancer_screening_dbt", "subjects": 5060}, {"collection_id": "victre", "subjects": 2994}, {"collection_id": "eay131", "subjects": 2813}, {"collection_id": "cmmd", "subjects": 1775}]}}
+{"id": "q040", "answer": {"ok": true, "rows": [{"collections": 0}]}}
+{"id": "q041", "answer": {"ok": true, "rows": [{"collections": 37}]}}
+{"id": "q042", "answer": {"ok": true, "rows": [{"species": "Human", "collections": 163}, {"species": "Mouse", "collections": 10}, {"species": "Phantom", "collections": 3}, {"species": "Canine", "collections": 2}, {"species": "Human, Mouse", "collections": 1}]}}
+{"id": "q043", "answer": {"ok": true, "rows": [{"collection_id": "nlst", "subjects": 26410}, {"collection_id": "cbis_ddsm", "subjects": 6671}, {"collection_id": "breast_cancer_screening_dbt", "subjects": 5060}, {"collection_id": "ccdi_mci", "subjects": 4407}, {"collection_id": "victre", "subjects": 2994}]}}
+{"id": "q044", "answer": {"ok": true, "rows": [{"patients": 86362, "studies": 168507, "series": 1044191}]}}
+{"id": "q045", "answer": {"ok": true, "rows": [{"series": 76300, "with_body_part": 0}]}}
+{"id": "q046", "answer": {"ok": true, "rows": [{"sop_class_name": "Grayscale Softcopy Presentation State Storage", "series": 240}, {"sop_class_name": "Segmentation Storage", "series": 200}, {"sop_class_name": "CT Image Storage", "series": 172}, {"sop_class_name": "Comprehensive SR Storage", "series": 140}, {"sop_class_name": "Digital X-Ray Image Storage - For Presentation", "series": 20}]}}
+{"id": "q047", "answer": {"ok": true, "rows": [{"series": 99839}]}}
+{"id": "q048", "answer": {"ok": true, "rows": [{"with_url": 3}]}}
+{"id": "q049", "answer": {"ok": true, "rows": [{"patients": 8}]}}
+{"id": "q050", "answer": {"ok": true, "rows": [{"modalities": 25}]}}
+{"id": "q051", "answer": {"ok": true, "rows": [{"collections": 26}]}}
+{"id": "q052", "answer": {"ok": true, "rows": [{"series": 474083}]}}
+{"id": "q053", "answer": {"ok": true, "rows": [{"latest_version": 25}]}}
+{"id": "q054", "answer": {"ok": true, "rows": [{"series": 38153}]}}
+{"id": "q055", "answer": {"ok": true, "rows": [{"series": 178801}]}}
+{"id": "q056", "answer": {"ok": true, "rows": [{"series": 104153}]}}
+{"id": "q057", "answer": {"ok": true, "rows": [{"series": 15519}]}}
+{"id": "q058", "answer": {"ok": true, "rows": [{"median_mb": 66.3}]}}
+{"id": "q059", "answer": {"ok": true, "rows": [{"series": 774}]}}
+{"id": "q060", "answer": {"ok": true, "rows": [{"PatientID": "1.3.6.1.4.1.9328.50.1.0109", "SeriesInstanceUID": "1.3.6.1.4.1.9328.50.1.54657", "series_size_MB": 0.53}, {"PatientID": "1.3.6.1.4.1.9328.50.1.0117", "SeriesInstanceUID": "1.3.6.1.4.1.9328.50.1.57707", "series_size_MB": 2.28}, {"PatientID": "1.3.6.1.4.1.9328.50.1.0121", "SeriesInstanceUID": "1.3.6.1.4.1.9328.50.1.69736", "series_size_MB": 0.53}, {"PatientID": "1.3.6.1.4.1.9328.50.2.0030", "SeriesInstanceUID": "1.3.6.1.4.1.9328.50.2.50462", "series_size_MB": 2.61}, {"PatientID": "1.3.6.1.4.1.9328.50.2.0072", "SeriesInstanceUID": "1.3.6.1.4.1.9328.50.2.126413", "series_size_MB": 2.1}]}}
+{"id": "q061", "answer": {"ok": true, "rows": [{"age_type": "VARCHAR", "filled": 231153}]}}
+{"id": "q062", "answer": {"ok": true, "rows": [{"collection_id": "rider_pilot", "subjects": 8, "status": "Complete"}]}}
+{"id": "q063", "answer": {"ok": true, "rows": [{"series": 0}]}}
+{"id": "q064", "answer": {"ok": true, "rows": [{"total_size_MB": 1.58}]}}

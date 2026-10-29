@@ -1,0 +1,9 @@
+.venv/
+downloads/
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+.claude/
+.agents
+*.db
+downloads/

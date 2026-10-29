@@ -1,0 +1,4 @@
+idc-index>=0.13.4
+streamlit>=1.50
+duckdb>=1.1
+pandas>=2.0

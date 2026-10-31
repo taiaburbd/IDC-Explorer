@@ -1,5 +1,7 @@
 # IDC Explorer
 
+**Proof of concept only.** This app is a demonstration of how to browse, ask, and download from the Imaging Data Commons. It is not a production service.
+
 A point-and-click app for the NCI **Imaging Data Commons**: find public cancer imaging
 (CT, MRI, PET, mammography, pathology, and more), preview it in the browser, check the
 licence, ask a question, or download DICOM files. No account.

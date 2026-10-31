@@ -85,6 +85,45 @@ The **Query source** control at the top of the left panel decides where catalogu
 
 **Remote IDC API** posts that same SQL to `https://api.imaging.datacommons.cancer.gov/v3/sql`. **Remote IDC MCP** posts it to the `run_sql` tool at `https://api.imaging.datacommons.cancer.gov/mcp`. A typed question is still turned into SQL on this computer; only the query moves. Downloads, the viewer, and citations do not follow this switch. The filter lists stay counted from the local catalogue. The remote service returns at most 10,000 rows.
 
+## Request process
+
+A question in the chat box is not sent to a language model. After you confirm, either a checked library query is used, or `assistant/translate.py` maps a few known words (collection id, modality, body part, sex) into one read-only SQL statement. The SQL playground skips the confirm step and runs the statement you wrote. **Query source** then decides where that statement runs.
+
+```mermaid
+flowchart TD
+  typed[Type a question in the chat box]
+  confirm{Are you sure}
+  stopped[Nothing is sent]
+  library{Matches a suggested question word for word}
+  checked[Use that question checked SQL]
+  rules[Map known words to SQL on this computer]
+  playground[SQL playground Run query]
+  sql[One read-only SQL statement]
+  qsrc{Query source}
+  local[DuckDB on this computer]
+  remoteApi[IDC API POST v3 sql]
+  remoteMcp[IDC MCP tool run_sql]
+  answer[Show the answer]
+
+  typed --> confirm
+  confirm -->|No| stopped
+  confirm -->|Yes| library
+  library -->|Yes| checked
+  library -->|No| rules
+  checked --> sql
+  rules --> sql
+  playground --> sql
+  sql --> qsrc
+  qsrc -->|Local| local
+  qsrc -->|Remote API| remoteApi
+  qsrc -->|Remote MCP| remoteMcp
+  local --> answer
+  remoteApi --> answer
+  remoteMcp --> answer
+```
+
+A word-for-word suggested question ignores the filters on screen. Any other question is planned from the words in the prompt, not from the filter SQL. Age, manufacturer, slice thickness, and the licence toggle stay on the filter tabs.
+
 ## Which URL each action calls
 
 The public IDC services are:

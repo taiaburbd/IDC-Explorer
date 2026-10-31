@@ -51,22 +51,22 @@ downloads, and enough free disk for the files you save.
 
 ```mermaid
 flowchart TD
-  click[You click in IDC Explorer]
+  click["You click in IDC Explorer"]
+  querysrc{"Query source setting"}
+  click --> querysrc
+  click --> openScan["Open a scan"]
+  click --> download["Start download"]
+  click --> cite["Generate citations"]
+  click --> missing["First load of a missing table"]
 
-  click --> source{Query source setting}
-  click --> open[Open a scan]
-  click --> download[Start download]
-  click --> cite[Generate citations]
-  click --> missing[First load of a missing table]
+  querysrc -->|Local| duck[("DuckDB on this computer")]
+  querysrc -->|Remote IDC API| api["POST /v3/sql"]
+  querysrc -->|Remote IDC MCP| mcp["POST /mcp tool run_sql"]
 
-  source -->|Local| duck[(DuckDB on this computer)]
-  source -->|Remote IDC API| api[POST /v3/sql]
-  source -->|Remote IDC MCP| mcp[POST /mcp tool run_sql]
-
-  open --> viewer[viewer.imaging.datacommons.cancer.gov]
-  download --> buckets[s3.amazonaws.com or storage.googleapis.com]
-  cite --> doi[dx.doi.org]
-  missing --> github[github.com/ImagingDataCommons/idc-index-data]
+  openScan --> viewer["viewer.imaging.datacommons.cancer.gov"]
+  download --> buckets["s3.amazonaws.com or storage.googleapis.com"]
+  cite --> doi["dx.doi.org"]
+  missing --> github["github.com/ImagingDataCommons/idc-index-data"]
 ```
 
 The same request flow is drawn as a Claude artifact: https://claude.ai/artifact/6mDVNyCmeT1Hk1o3YFJ1CC

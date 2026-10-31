@@ -53,20 +53,30 @@ downloads, and enough free disk for the files you save.
 flowchart TD
   click["You click in IDC Explorer"]
   querysrc{"Query source setting"}
+  openScan["Open a scan"]
+  download["Start download"]
+  cite["Generate citations"]
+  missing["First load of a missing table"]
+  duck[("DuckDB on this computer")]
+  api["POST /v3/sql"]
+  mcp["POST /mcp tool run_sql"]
+  viewer["viewer.imaging.datacommons.cancer.gov"]
+  buckets["s3.amazonaws.com or storage.googleapis.com"]
+  doi["dx.doi.org"]
+  gh["github.com/ImagingDataCommons/idc-index-data"]
+
   click --> querysrc
-  click --> openScan["Open a scan"]
-  click --> download["Start download"]
-  click --> cite["Generate citations"]
-  click --> missing["First load of a missing table"]
-
-  querysrc -->|Local| duck[("DuckDB on this computer")]
-  querysrc -->|Remote IDC API| api["POST /v3/sql"]
-  querysrc -->|Remote IDC MCP| mcp["POST /mcp tool run_sql"]
-
-  openScan --> viewer["viewer.imaging.datacommons.cancer.gov"]
-  download --> buckets["s3.amazonaws.com or storage.googleapis.com"]
-  cite --> doi["dx.doi.org"]
-  missing --> github["github.com/ImagingDataCommons/idc-index-data"]
+  click --> openScan
+  click --> download
+  click --> cite
+  click --> missing
+  querysrc -->|Local| duck
+  querysrc -->|Remote IDC API| api
+  querysrc -->|Remote IDC MCP| mcp
+  openScan --> viewer
+  download --> buckets
+  cite --> doi
+  missing --> gh
 ```
 
 The same request flow is drawn as a Claude artifact: https://claude.ai/artifact/6mDVNyCmeT1Hk1o3YFJ1CC
